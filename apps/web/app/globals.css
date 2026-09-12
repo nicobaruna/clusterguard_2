@@ -1,0 +1,237 @@
+:root {
+  --bg: #e8edf2;
+  --panel: #ffffff;
+  --critical: #d62b2b;
+  --warning: #f28c28;
+  --security: #123c73;
+  --text: #111827;
+  --muted: #4b5563;
+  --shadow: rgba(17, 24, 39, 0.12);
+  --line: #dce3ea;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--text); }
+button { font: inherit; }
+button:focus-visible, input:focus-visible, .slider:focus-visible { outline: 3px solid #f7c948; outline-offset: 3px; }
+
+.page-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top right, #ffffff 0, transparent 34%), linear-gradient(135deg, #e8edf2, #cfd9e3);
+}
+
+.panel {
+  width: min(620px, 100%);
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 26px;
+  box-shadow: 0 24px 60px var(--shadow);
+  padding: clamp(22px, 5vw, 42px);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ghost:hover { background: #f3f6f8; }
+
+.auth-shell { padding: 18px; }
+.auth-wrapper { width: min(460px, 100%); }
+.auth-card { background: var(--panel); border-top: 6px solid var(--security); border-radius: 24px; padding: clamp(24px, 6vw, 44px); box-shadow: 0 24px 60px var(--shadow); }
+.auth-card::before { content: 'CLUSTERGUARD'; display: block; color: var(--security); font: 800 0.78rem/1 Arial, sans-serif; letter-spacing: 0.16em; margin-bottom: 10px; }
+.auth-card::after { content: 'Komunitas siaga, saling menjaga.'; display: block; color: var(--muted); font: 0.9rem/1.4 Arial, sans-serif; margin-top: 18px; }
+.segmented-control { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 24px; background: #edf2f6; border-radius: 12px; }
+.segmented-control button { border: 0; border-radius: 9px; padding: 11px; background: transparent; color: var(--muted); font: 700 0.9rem Arial, sans-serif; cursor: pointer; }
+.segmented-control button.active { background: #ffffff; color: var(--security); box-shadow: 0 3px 10px rgba(17, 24, 39, 0.1); }
+.auth-card label { display: grid; gap: 7px; margin-top: 15px; color: var(--muted); font: 700 0.82rem Arial, sans-serif; }
+.auth-card input { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px; color: var(--text); background: #fbfcfd; font: 1rem Arial, sans-serif; }
+.auth-card input:focus { border-color: var(--security); background: white; }
+.auth-message { margin: 16px 0 0; color: var(--security); font: 0.9rem/1.4 Arial, sans-serif; }
+.error-message { margin: 0; color: #a61b1b; font: 700 0.9rem/1.4 Arial, sans-serif; }
+.auth-card .primary-button { width: 100%; margin-top: 22px; }
+.primary-button:disabled { cursor: wait; opacity: 0.62; }
+
+h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 4vw, 2.55rem);
+  line-height: 1.08;
+}
+
+.subtitle {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.stack { display: grid; gap: 12px; }
+
+.category {
+  border: none;
+  border-radius: 18px;
+  min-height: 104px;
+  color: white;
+  font-weight: 800;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 12px 22px rgba(0,0,0,0.12);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.category:hover { transform: translateY(-3px); box-shadow: 0 16px 26px rgba(0,0,0,0.16); }
+
+.category.critical { background: var(--critical); }
+.category.warning { background: var(--warning); }
+.category.security { background: var(--security); }
+
+.icon { font-size: 2rem; }
+
+.confirm-box {
+  margin-top: 22px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 18px;
+}
+
+.confirm-box h2 {
+  margin: 0 0 10px;
+  text-align: center;
+  color: var(--critical);
+}
+
+.confirm-box p {
+  margin: 0 0 14px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #edf2f7;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 700;
+  color: var(--text);
+  user-select: none;
+  cursor: pointer;
+  touch-action: none;
+  transition: background 160ms ease;
+}
+
+.slider-knob {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+.slider.active {
+  background: #dcfce7;
+}
+
+.link-button {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.status-box {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #f9fafb;
+}
+
+.status-pill {
+  display: inline-block;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.status-box h2 {
+  margin: 0;
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+
+.status-note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.primary-button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: var(--security);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary-button:hover { filter: brightness(1.12); }
+
+.fallback-box {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+
+.fallback-box h3 {
+  margin: 0;
+  color: #9a4d00;
+}
+
+.fallback-box a {
+  display: block;
+  padding: 12px 14px;
+  background: white;
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .page-shell { padding: 12px; }
+  .panel { border-radius: 20px; padding: 20px; }
+  .topbar { margin-bottom: 24px; }
+  .category { min-height: 84px; font-size: 1.25rem; }
+  .slider { font: 700 0.85rem Arial, sans-serif; padding: 9px 12px 9px 9px; }
+}

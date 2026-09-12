@@ -1,0 +1,8 @@
+node_modules
+.next
+out
+.env
+.env.local
+.npm
+.DS_Store
+apps/api/.dev.vars

@@ -1,0 +1,14 @@
+{
+  "name": "clusterguard",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @clusterguard/api && npm run build --workspace @clusterguard/web",
+    "dev": "npm run dev --workspace @clusterguard/web",
+    "mobile": "npm run start --workspace @clusterguard/mobile",
+    "mobile:typecheck": "npm run typecheck --workspace @clusterguard/mobile",
+    "mobile:android": "npm run android --workspace @clusterguard/mobile"
+  }
+}
