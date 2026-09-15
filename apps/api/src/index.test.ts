@@ -1,28 +1,104 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sign } from 'hono/jwt';
 import app from './index';
 
+const bindings = {
+  FRONTEND_URL: 'http://localhost:3000',
+  SUPABASE_JWT_SECRET: 'test-secret',
+  SUPABASE_URL: 'https://supabase.test',
+  SUPABASE_SERVICE_ROLE_KEY: 'service-role-test',
+};
+const key = '11111111-1111-4111-8111-111111111111';
+
+afterEach(() => vi.unstubAllGlobals());
+
 describe('ClusterGuard API', () => {
   it('reports service health', async () => {
-    const response = await app.request('/', undefined, { FRONTEND_URL: 'http://localhost:3000', SUPABASE_JWT_SECRET: 'test-secret' });
+    const response = await app.request('/', undefined, bindings);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true, service: 'ClusterGuard API' });
   });
 
-  it('rejects invalid SOS categories before authentication work', async () => {
-    const response = await app.request('/sos', { method: 'POST', body: JSON.stringify({ category: 'INVALID' }) }, { FRONTEND_URL: 'http://localhost:3000', SUPABASE_JWT_SECRET: 'test-secret' });
+  it('rejects invalid categories and idempotency keys', async () => {
+    const response = await app.request('/sos', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await sign({ sub: 'sender' }, 'test-secret')}` },
+      body: JSON.stringify({ category: 'INVALID' }),
+    }, bindings);
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects unknown SOS body fields', async () => {
+    const response = await app.request('/sos', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await sign({ sub: '11111111-1111-4111-8111-111111111111' }, 'test-secret')}`, 'Idempotency-Key': key },
+      body: JSON.stringify({ category: 'MEDIS', sender_id: 'spoofed' }),
+    }, bindings);
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects a JWT with an invalid sender subject', async () => {
+    const response = await app.request('/sos', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${await sign({ sub: 'not-a-uuid' }, 'test-secret')}`,
+        'Idempotency-Key': key,
+      },
+      body: JSON.stringify({ category: 'MEDIS' }),
+    }, bindings);
     expect(response.status).toBe(401);
   });
 
-  it('derives the SOS sender from the verified JWT subject', async () => {
-    const token = await sign({ sub: 'sender-from-jwt' }, 'test-secret');
+  it('persists an SOS using the JWT sender and idempotency key', async () => {
+    const calls: Request[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      calls.push(new Request(input, init));
+      if (calls.length === 1) return new Response(JSON.stringify([]), { status: 200 });
+      return new Response(JSON.stringify([{ id: 'event-1', sender_id: '11111111-1111-4111-8111-111111111111', category: 'MEDIS', status: 'PENDING' }]), { status: 201 });
+    }));
     const response = await app.request('/sos', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category: 'MEDIS', sender_id: 'spoofed-client-id' }),
-    }, { FRONTEND_URL: 'http://localhost:3000', SUPABASE_JWT_SECRET: 'test-secret' });
+      headers: {
+        Authorization: `Bearer ${await sign({ sub: '11111111-1111-4111-8111-111111111111' }, 'test-secret')}`,
+        'Content-Type': 'application/json',
+        'Idempotency-Key': key,
+      },
+      body: JSON.stringify({ category: 'MEDIS' }),
+    }, bindings);
     expect(response.status).toBe(201);
     const payload = await response.json() as { event: { sender_id: string } };
-    expect(payload.event.sender_id).toBe('sender-from-jwt');
+    expect(payload.event.sender_id).toBe('11111111-1111-4111-8111-111111111111');
+    expect(calls[1].headers.get('Authorization')).toContain('Bearer service-role-test');
+    expect(calls[1].headers.get('Prefer')).toContain('resolution=ignore-duplicates');
+  });
+
+  it('returns an existing event without inserting on an idempotent retry', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify([{ id: 'existing', sender_id: 'original', category: 'MEDIS', status: 'PENDING' }]), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const response = await app.request('/sos', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await sign({ sub: '11111111-1111-4111-8111-111111111111' }, 'test-secret')}`, 'Idempotency-Key': key },
+      body: JSON.stringify({ category: 'MEDIS' }),
+    }, bindings);
+    expect(response.status).toBe(200);
+    const payload = await response.json() as { event: { id: string } };
+    expect(payload.event.id).toBe('existing');
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it('recovers an existing event when a concurrent insert returns conflict', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }))
+      .mockResolvedValueOnce(new Response('{}', { status: 409 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify([{ id: 'raced', sender_id: 'original', category: 'MEDIS', status: 'PENDING' }]), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const response = await app.request('/sos', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await sign({ sub: '22222222-2222-4222-8222-222222222222' }, 'test-secret')}`, 'Idempotency-Key': key },
+      body: JSON.stringify({ category: 'MEDIS' }),
+    }, bindings);
+    expect(response.status).toBe(201);
+    const payload = await response.json() as { event: { id: string } };
+    expect(payload.event.id).toBe('raced');
   });
 });

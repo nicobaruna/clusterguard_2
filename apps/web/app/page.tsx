@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from './auth-store';
 import { createSyncManager } from './sync-manager';
 import { supabase } from '../lib/supabase';
+import { submitSos } from './sos-client';
 
 export default function HomePage() {
   const { user, initialize, signIn, signUp, signOut } = useAuthStore();
@@ -28,12 +29,15 @@ export default function HomePage() {
         const { data } = await supabase.auth.getSession();
         const accessToken = data.session?.access_token;
         if (!accessToken) return { status: 401 };
-        const response = await fetch(`${backendUrl}/sync/${record.entity}`, {
+        const path = record.entity === 'sos_event' ? '/sos' : `/sync/${record.entity}`;
+        const response = await fetch(`${backendUrl}${path}`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
-            'Idempotency-Key': record.localId,
+            'Idempotency-Key': typeof record.payload === 'object' && record.payload !== null && 'idempotencyKey' in record.payload
+              ? String(record.payload.idempotencyKey)
+              : record.localId,
           },
           body: JSON.stringify(record.payload),
         });
@@ -67,6 +71,14 @@ export default function HomePage() {
           <p className="eyebrow">{user.role}</p>
           <h1>Halo, {user.fullName}</h1>
           <p>Akun Anda terhubung dengan autentikasi Supabase.</p>
+          <div className="tabs">
+            {(['MEDIS', 'BENCANA', 'KEAMANAN'] as const).map((category) => (
+              <button key={category} onClick={() => void submitSos(category, process.env.NEXT_PUBLIC_BACKEND_URL ?? '').then((result) => setMessage(
+                result === 'sent' ? 'SOS terkirim.' : result === 'queued' ? 'SOS disimpan dan menunggu sinkronisasi.' : result === 'unauthorized' ? 'Sesi berakhir. Silakan masuk kembali.' : 'SOS gagal dikirim.',
+              ))}>{category}</button>
+            ))}
+          </div>
+          {message && <p role="status" className="message">{message}</p>}
           <button className="primary" onClick={() => void signOut()}>Keluar</button>
         </section>
       </main>

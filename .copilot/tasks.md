@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: Offline-first queue and background sync implemented and quality-gated; commit/push approval required.
+Status: Concrete SOS write path implemented and quality-gated; commit/push approval required.
 
 ## Phase 0: Confirm decisions
 
@@ -61,7 +61,7 @@ Offline-first sync task completed:
 - [x] Add Web Locks with renewed localStorage lease fallback.
 - [x] Add SOS idempotency migration and partial unique index.
 - [x] Tests, typecheck, lint, build, security, and performance gates pass.
-- [ ] Connect concrete SOS write endpoint to the queue in the next backend task.
+- [x] Connect concrete SOS write endpoint to the queue.
 
 Phase 2 validation completed for this task:
 
@@ -75,13 +75,22 @@ Phase 2 validation completed for this task:
 
 ## Phase 3: Backend SOS API
 
-- [ ] Validate SOS categories with Zod.
-- [ ] Implement authenticated `POST /sos`.
-- [ ] Derive `sender_id` from the verified JWT.
-- [ ] Persist before responding.
+- [x] Validate SOS categories with strict Zod schema.
+- [x] Implement authenticated `POST /sos`.
+- [x] Derive `sender_id` from the verified JWT.
+- [x] Persist before responding through server-side Supabase REST.
+- [x] Enforce UUID sender and idempotency-key validation.
+- [x] Recover concurrent idempotent insert conflicts.
 - [ ] Broadcast notifications asynchronously with `waitUntil()`.
 - [ ] Implement authorized, idempotent `PATCH /sos/:id/resolve`.
 - [ ] Implement device-token registration/upsert.
+
+Phase 3 validation completed for this task:
+
+- [x] Endpoint tests cover validation, persistence, sender spoofing, retry, and conflict recovery.
+- [x] Queue retries preserve the same idempotency key.
+- [x] Tests, typecheck, lint, build, security, and performance gates pass.
+- [ ] Live authenticated SOS persistence test.
 
 ## Phase 4: Warga and Super Admin PWA
 
@@ -134,4 +143,4 @@ Phase 2 validation completed for this task:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync is implemented and quality-gated. The concrete SOS backend transport remains the next integration task. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync and concrete Hono SOS persistence are implemented and quality-gated. FCM broadcast and live authenticated SOS persistence remain future work. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.

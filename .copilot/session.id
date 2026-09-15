@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (offline-first sync quality-gated)
-Current phase: Phase 2 - Authentication / offline sync
-Status: Offline-first queue and background sync quality-gated; commit/push approval required
+Updated: 2026-09-15 (SOS write path quality-gated)
+Current phase: Phase 3 - Backend SOS API
+Status: Concrete SOS write path quality-gated; commit/push approval required
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -46,15 +46,20 @@ Completed this session:
 - Started the sync manager from the web page lifecycle with bearer auth and `Idempotency-Key` transport.
 - Added and applied `20260915000100_add_sos_idempotency.sql` with nullable UUID client key and partial unique index.
 - Offline sync validation: API/web tests 21 total pass, typecheck/lint/build pass, security review pass, performance review pass.
+- User approved commit/push for the offline-first task.
+- Commit `2197943a23129dc90ad25dfa19cfee6e2f27755a feat(sync): add offline queue and background synchronization` pushed successfully to `dev`.
+- Implemented Hono `POST /sos` with strict Zod validation, exact JWT protection, UUID sender validation, server-side Supabase REST persistence, and idempotency conflict recovery.
+- Connected the web SOS client and offline queue to `/sos`, preserving the idempotency key across retries.
+- SOS task tests, typecheck, lint, build, security, and performance gates pass.
 
 Blocker:
-- Concrete SOS backend write endpoint is not implemented yet; queue transport is ready but no SOS records are enqueued by a completed feature.
-- Concurrent resolution remains deferred until the SOS resolve endpoint/function exists.
+- Live authenticated SOS persistence test remains pending; no permanent test credential was created.
+- FCM broadcast and concurrent resolution remain deferred.
 
 Next action when resuming:
-1. Obtain approval to commit/push the offline-first sync task.
-2. Implement the persisted SOS write path through Hono and connect it to the queue.
-3. Implement network-vs-401 session handling end-to-end.
+1. Obtain approval to commit/push the concrete SOS write path task.
+2. Implement FCM broadcast through `waitUntil()`.
+3. Implement SOS resolve endpoint and concurrent resolution behavior.
 
 Security notes:
 - Do not read, print, commit, or copy values from `.env.local` into task or session files.
