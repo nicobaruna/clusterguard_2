@@ -1,15 +1,5 @@
-import './globals.css';
-import type { Metadata } from 'next';
+export const metadata = { title: 'ClusterGuard SOS' };
 
-export const metadata: Metadata = {
-  title: 'ClusterGuard SOS',
-  description: 'Emergency SOS for cluster communities',
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="id"><body>{children}</body></html>;
 }

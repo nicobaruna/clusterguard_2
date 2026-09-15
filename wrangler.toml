@@ -1,0 +1,5 @@
+name = "clusterguard-api"
+main = "apps/api/src/index.ts"
+compatibility_date = "2024-12-01"
+[vars]
+FRONTEND_URL = "http://localhost:3000"

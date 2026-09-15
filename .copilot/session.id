@@ -1,0 +1,41 @@
+ClusterGuard resume checkpoint
+
+Updated: 2026-09-15 (commit/push authorized)
+Current phase: Phase 1 - Database and security
+Status: RLS hardening applied; committing and pushing approved changes
+
+Completed this session:
+- Read all four project Markdown documents through a read-only scan.
+- Consolidated the phased implementation plan into `.copilot/tasks.md`.
+- User explicitly approved a destructive reset of both local rebuild artifacts and the linked Supabase database.
+- Linked Supabase database reset completed successfully.
+- Removed rebuildable local artifacts: `apps`, `supabase`, `package.json`, `package-lock.json`, `wrangler.toml`, and rebuilt `README.md`.
+- Preserved `.env.local`, `.git`, all design Markdown files, `.copilot/tasks.md`, and `.copilot/session.id`.
+- Recreated the npm workspace, web/API packages, clean baseline migration, and minimal app/test entrypoints.
+- `npm install`, `npm run typecheck`, `npm run build`, and `npm test` pass.
+- Re-linked Supabase and applied the clean baseline migration successfully.
+- Verified `public.users`, `public.sos_events`, and `public.user_devices` exist with RLS enabled.
+- Added `20260914000200_rls_hardening.sql` with controlled role helper, role-safe profile updates, owner-scoped devices, explicit SOS write revocation, and ownership indexes.
+- Added migration contract tests and JWT sender-isolation coverage.
+- Quality gates pass: typecheck, build, lint, tests (8/8), security review, and performance review.
+- Applied RLS hardening migration to the linked Supabase project and verified RLS remains enabled on all three tables.
+- `issue.log` contains the initial lint/security/performance loop findings; all actionable findings are resolved.
+- Updated `.copilot/workflow.md`: after all gates and required migration verification pass, commit and push to the active branch are mandatory; force-push requires separate approval.
+- `git diff --check` passed for the workflow update; branch is `dev` and a Git remote is configured.
+- User explicitly authorized commit and push for this task.
+- Final local gates pass after the ES2017 target fix: typecheck, lint, tests (8/8), and workspace-scoped web build exit 0.
+
+Blocker:
+- The previous migration history is intentionally discarded; the new baseline must start with a fresh migration.
+- Remaining follow-up: live adversarial RLS session tests and concurrent resolution behavior. The current task is ready for commit/push; these follow-up tests remain visible in `.copilot/tasks.md`.
+
+Next action when resuming:
+1. Complete live adversarial RLS session tests and concurrent resolution behavior.
+2. Finish the current task's task.log entry, commit, and push according to `.copilot/workflow.md`.
+3. Implement Supabase Auth signup/login and trusted role loading.
+4. Implement persistent offline-aware sessions.
+5. Build the persisted SOS write path through Hono.
+
+Security notes:
+- Do not read, print, commit, or copy values from `.env.local` into task or session files.
+- Do not store plaintext passwords in `public.users`; Supabase Auth must own password verification.
