@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (live RLS validation complete)
-Current phase: Phase 1 - Database and security
-Status: Live RLS validation complete; commit/push approval required
+Updated: 2026-09-15 (Auth provider test passed)
+Current phase: Phase 2 - Authentication
+Status: Auth implementation and provider test passed; commit/push approval required
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -30,18 +30,27 @@ Completed this session:
 - Live linked-database validation passed all 8 scenarios: anonymous isolation, WARGA profile/event/device isolation, role immutability, direct SOS-write denial, PIC visibility, and device-owner access. Transaction rolled back.
 - Resolved the workspace build exit failure by regenerating the root lockfile with `npm install --package-lock-only`; workspace build now exits 0 with a non-fatal Next ENOWORKSPACES warning.
 - Concurrent resolution remains deferred because no SOS resolve endpoint/function exists yet.
+- User approved commit/push for the live RLS task.
+- Commit `409a635f7b8b42c9eeb94f85e94347d88030de83 test(security): validate live row-level policies` was pushed to `dev`.
+- Post-push verification: working tree clean; local HEAD equals origin/dev.
+- Implemented Supabase Auth phone signup for WARGA/PIC and email login for SUPER_ADMIN.
+- Added trusted profile/role loading from `public.users`, role mismatch rejection, session recovery via `getSession`, invalid-profile sign-out, and failure-safe form submission.
+- Added Auth policy and contract tests; total test suite passes 13/13.
+- Auth task quality gates pass: typecheck, lint, workspace web build, security review, and performance review.
+- Migration step: not applicable; existing schema/trigger already supports phone profile creation and no database shape changed.
+- Temporary Super Admin Auth test passed with a unique in-memory credential: Auth user creation, profile role update, anon email/password login, trusted profile role read, and cleanup all passed.
+- No test user remains; no credential or password was persisted or reported.
+- Auth regression suite after the provider test: 4 test files and 13 tests passed.
 
 Blocker:
-- The previous migration history is intentionally discarded; the new baseline must start with a fresh migration.
-- Remaining follow-up: live adversarial RLS session tests and concurrent resolution behavior. The current task is ready for commit/push; these follow-up tests remain visible in `.copilot/tasks.md`.
+- Live provider login/signup test remains unresolved; no permanent credentials were created.
+- Concurrent resolution remains deferred until the SOS resolve endpoint/function exists.
 
 Next action when resuming:
-1. Obtain explicit approval to commit/push the completed live RLS validation task.
-2. Commit/push after updating `task.log` according to `.copilot/workflow.md`.
-3. Obtain approval for the next task plan before changing code.
-4. Implement Supabase Auth signup/login and trusted role loading.
-5. Implement persistent offline-aware sessions.
-6. Build the persisted SOS write path through Hono.
+1. Obtain approval for the next task plan before changing code.
+2. Obtain approval to commit/push the completed Auth task.
+3. Implement persistent offline-aware sessions and network-vs-401 handling.
+4. Build the persisted SOS write path through Hono.
 
 Security notes:
 - Do not read, print, commit, or copy values from `.env.local` into task or session files.

@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: Live adversarial RLS validation complete; commit/push approval required.
+Status: Auth signup/login implemented and quality-gated; commit/push approval required.
 
 ## Phase 0: Confirm decisions
 
@@ -43,12 +43,22 @@ Phase 1 validation:
 
 ## Phase 2: Authentication
 
-- [ ] Implement Warga/PIC registration with phone number and password.
-- [ ] Implement Super Admin email/password login.
-- [ ] Link profiles to `auth.users.id`.
-- [ ] Load trusted roles from the database.
+- [x] Implement Warga/PIC registration with phone number and password.
+- [x] Implement Super Admin email/password login.
+- [x] Link profiles to `auth.users.id` through the existing trigger.
+- [x] Load trusted roles from the database.
 - [ ] Preserve sessions during reload and offline startup.
 - [ ] Distinguish network failures from online `401` responses.
+
+Phase 2 validation completed for this task:
+
+- [x] Signup excludes client-selected roles.
+- [x] Email/phone role mismatch is rejected.
+- [x] Session recovery reloads the trusted profile and signs out invalid profiles.
+- [x] Auth form releases submitting state on rejected requests.
+- [x] 13 unit/contract tests pass.
+- [x] Typecheck, lint, build, security, and performance gates pass.
+- [ ] Live provider login/signup test with real test accounts.
 
 ## Phase 3: Backend SOS API
 
@@ -111,4 +121,4 @@ Phase 1 validation:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline plus RLS hardening migration. Local typecheck, build, lint, tests, security review, and performance review pass. Live adversarial RLS session tests pass; concurrent resolution is deferred until the SOS resolve endpoint/function exists. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline plus RLS hardening migration. Auth signup/login implementation and local quality gates pass. No migration was needed for this Auth task. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
