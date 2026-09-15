@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (Auth committed and pushed)
-Current phase: Phase 2 - Authentication
-Status: Auth implementation and provider test passed; committed and pushed
+Updated: 2026-09-15 (offline-first sync quality-gated)
+Current phase: Phase 2 - Authentication / offline sync
+Status: Offline-first queue and background sync quality-gated; commit/push approval required
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -41,14 +41,20 @@ Completed this session:
 - Temporary Super Admin Auth test passed with a unique in-memory credential: Auth user creation, profile role update, anon email/password login, trusted profile role read, and cleanup all passed.
 - No test user remains; no credential or password was persisted or reported.
 - Auth regression suite after the provider test: 4 test files and 13 tests passed.
+- Added browser-guarded local queue with sensitive payload rejection, storage failure reporting, retention pruning, and bounded queue capacity.
+- Added sync manager with `online` event, interval retries, 401 handling, 4xx/429/5xx classification, exponential backoff, Web Locks, renewed lease fallback, and explicit stop cleanup.
+- Started the sync manager from the web page lifecycle with bearer auth and `Idempotency-Key` transport.
+- Added and applied `20260915000100_add_sos_idempotency.sql` with nullable UUID client key and partial unique index.
+- Offline sync validation: API/web tests 21 total pass, typecheck/lint/build pass, security review pass, performance review pass.
 
 Blocker:
+- Concrete SOS backend write endpoint is not implemented yet; queue transport is ready but no SOS records are enqueued by a completed feature.
 - Concurrent resolution remains deferred until the SOS resolve endpoint/function exists.
 
 Next action when resuming:
-1. Obtain approval for the next task plan before changing code.
-2. Implement persistent offline-aware sessions and network-vs-401 handling.
-3. Build the persisted SOS write path through Hono.
+1. Obtain approval to commit/push the offline-first sync task.
+2. Implement the persisted SOS write path through Hono and connect it to the queue.
+3. Implement network-vs-401 session handling end-to-end.
 
 Security notes:
 - Do not read, print, commit, or copy values from `.env.local` into task or session files.

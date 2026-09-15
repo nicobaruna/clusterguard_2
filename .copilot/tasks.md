@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: Auth signup/login implemented, provider-tested, committed, and pushed.
+Status: Offline-first queue and background sync implemented and quality-gated; commit/push approval required.
 
 ## Phase 0: Confirm decisions
 
@@ -49,6 +49,19 @@ Phase 1 validation:
 - [x] Load trusted roles from the database.
 - [ ] Preserve sessions during reload and offline startup.
 - [ ] Distinguish network failures from online `401` responses.
+
+Offline-first sync task completed:
+
+- [x] Store operational records locally with `pending`, `syncing`, `synced`, and `failed` flags.
+- [x] Start background sync from the web page lifecycle.
+- [x] Sync on browser `online` event and bounded interval retry.
+- [x] Keep network failures retryable and stop on definitive `401`.
+- [x] Handle terminal 4xx and bounded 429/5xx backoff.
+- [x] Add queue cap, retention pruning, storage failure handling, and sensitive payload rejection.
+- [x] Add Web Locks with renewed localStorage lease fallback.
+- [x] Add SOS idempotency migration and partial unique index.
+- [x] Tests, typecheck, lint, build, security, and performance gates pass.
+- [ ] Connect concrete SOS write endpoint to the queue in the next backend task.
 
 Phase 2 validation completed for this task:
 
@@ -121,4 +134,4 @@ Phase 2 validation completed for this task:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline plus RLS hardening migration. Auth signup/login implementation, temporary provider test, and local quality gates pass. Auth changes are committed and pushed. No migration was needed for this Auth task. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync is implemented and quality-gated. The concrete SOS backend transport remains the next integration task. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.

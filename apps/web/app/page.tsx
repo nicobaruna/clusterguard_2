@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './auth-store';
+import { createSyncManager } from './sync-manager';
+import { supabase } from '../lib/supabase';
 
 export default function HomePage() {
   const { user, initialize, signIn, signUp, signOut } = useAuthStore();
@@ -17,6 +19,31 @@ export default function HomePage() {
   useEffect(() => {
     void initialize().catch(() => setMessage('Sesi tidak dapat dipulihkan. Silakan masuk kembali.'));
   }, [initialize]);
+
+  useEffect(() => {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const manager = createSyncManager({
+      send: async (record) => {
+        if (!backendUrl || !supabase) throw new Error('SYNC_TRANSPORT_UNAVAILABLE');
+        const { data } = await supabase.auth.getSession();
+        const accessToken = data.session?.access_token;
+        if (!accessToken) return { status: 401 };
+        const response = await fetch(`${backendUrl}/sync/${record.entity}`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'Idempotency-Key': record.localId,
+          },
+          body: JSON.stringify(record.payload),
+        });
+        return { status: response.status };
+      },
+      onUnauthorized: () => void signOut(),
+    });
+    manager.start();
+    return manager.stop;
+  }, [signOut]);
 
   const submit = async () => {
     setIsSubmitting(true);
