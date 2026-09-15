@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (commit/push authorized)
+Updated: 2026-09-15 (live RLS validation complete)
 Current phase: Phase 1 - Database and security
-Status: RLS hardening applied; committing and pushing approved changes
+Status: Live RLS validation complete; commit/push approval required
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -24,17 +24,24 @@ Completed this session:
 - `git diff --check` passed for the workflow update; branch is `dev` and a Git remote is configured.
 - User explicitly authorized commit and push for this task.
 - Final local gates pass after the ES2017 target fix: typecheck, lint, tests (8/8), and workspace-scoped web build exit 0.
+- Committed `5ebcc5f feat(security): harden database row-level security` and pushed successfully to `dev`.
+- Removed generated artifacts in cleanup commit `5b21774b270c` and pushed successfully to `dev`.
+- Added rollback-only live RLS test at `supabase/tests/rls_adversarial.sql`.
+- Live linked-database validation passed all 8 scenarios: anonymous isolation, WARGA profile/event/device isolation, role immutability, direct SOS-write denial, PIC visibility, and device-owner access. Transaction rolled back.
+- Resolved the workspace build exit failure by regenerating the root lockfile with `npm install --package-lock-only`; workspace build now exits 0 with a non-fatal Next ENOWORKSPACES warning.
+- Concurrent resolution remains deferred because no SOS resolve endpoint/function exists yet.
 
 Blocker:
 - The previous migration history is intentionally discarded; the new baseline must start with a fresh migration.
 - Remaining follow-up: live adversarial RLS session tests and concurrent resolution behavior. The current task is ready for commit/push; these follow-up tests remain visible in `.copilot/tasks.md`.
 
 Next action when resuming:
-1. Complete live adversarial RLS session tests and concurrent resolution behavior.
-2. Finish the current task's task.log entry, commit, and push according to `.copilot/workflow.md`.
-3. Implement Supabase Auth signup/login and trusted role loading.
-4. Implement persistent offline-aware sessions.
-5. Build the persisted SOS write path through Hono.
+1. Obtain explicit approval to commit/push the completed live RLS validation task.
+2. Commit/push after updating `task.log` according to `.copilot/workflow.md`.
+3. Obtain approval for the next task plan before changing code.
+4. Implement Supabase Auth signup/login and trusted role loading.
+5. Implement persistent offline-aware sessions.
+6. Build the persisted SOS write path through Hono.
 
 Security notes:
 - Do not read, print, commit, or copy values from `.env.local` into task or session files.

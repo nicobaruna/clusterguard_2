@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: Phase 1 RLS hardening implemented and applied; commit/push pending explicit instruction.
+Status: Live adversarial RLS validation complete; commit/push approval required.
 
 ## Phase 0: Confirm decisions
 
@@ -37,7 +37,8 @@ Phase 1 validation:
 - [x] Fresh migration succeeds.
 - [x] RLS remains enabled after migration.
 - [x] Policy contract and JWT sender-isolation tests pass.
-- [ ] Live adversarial RLS session tests and concurrent resolution test.
+- [x] Live adversarial RLS session tests.
+- [ ] Concurrent resolution test (deferred until SOS resolve endpoint/function exists).
 - [x] No plaintext password is stored in `public.users`.
 
 ## Phase 2: Authentication
@@ -110,4 +111,4 @@ Phase 1 validation:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline plus RLS hardening migration. Local typecheck, build, lint, tests, security review, and performance review pass. Live adversarial RLS session tests remain before Phase 1 is fully closed. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline plus RLS hardening migration. Local typecheck, build, lint, tests, security review, and performance review pass. Live adversarial RLS session tests pass; concurrent resolution is deferred until the SOS resolve endpoint/function exists. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
