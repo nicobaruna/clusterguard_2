@@ -7,6 +7,7 @@ out
 .DS_Store
 apps/api/.dev.vars
 apps/api/firebase-key.json
+apps/web/tsconfig.tsbuildinfo
 apps/api/.wrangler
 apps/api/dist
 supabase/.temp

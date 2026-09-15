@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: Auth signup/login implemented and quality-gated; commit/push approval required.
+Status: Auth signup/login implemented, provider-tested, committed, and pushed.
 
 ## Phase 0: Confirm decisions
 
@@ -58,7 +58,7 @@ Phase 2 validation completed for this task:
 - [x] Auth form releases submitting state on rejected requests.
 - [x] 13 unit/contract tests pass.
 - [x] Typecheck, lint, build, security, and performance gates pass.
-- [ ] Live provider login/signup test with real test accounts.
+- [x] Live provider login/signup test with a temporary Super Admin credential; cleanup verified.
 
 ## Phase 3: Backend SOS API
 
@@ -121,4 +121,4 @@ Phase 2 validation completed for this task:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline plus RLS hardening migration. Auth signup/login implementation and local quality gates pass. No migration was needed for this Auth task. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline plus RLS hardening migration. Auth signup/login implementation, temporary provider test, and local quality gates pass. Auth changes are committed and pushed. No migration was needed for this Auth task. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.

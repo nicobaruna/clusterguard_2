@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (Auth provider test passed)
+Updated: 2026-09-15 (Auth committed and pushed)
 Current phase: Phase 2 - Authentication
-Status: Auth implementation and provider test passed; commit/push approval required
+Status: Auth implementation and provider test passed; committed and pushed
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -43,14 +43,12 @@ Completed this session:
 - Auth regression suite after the provider test: 4 test files and 13 tests passed.
 
 Blocker:
-- Live provider login/signup test remains unresolved; no permanent credentials were created.
 - Concurrent resolution remains deferred until the SOS resolve endpoint/function exists.
 
 Next action when resuming:
 1. Obtain approval for the next task plan before changing code.
-2. Obtain approval to commit/push the completed Auth task.
-3. Implement persistent offline-aware sessions and network-vs-401 handling.
-4. Build the persisted SOS write path through Hono.
+2. Implement persistent offline-aware sessions and network-vs-401 handling.
+3. Build the persisted SOS write path through Hono.
 
 Security notes:
 - Do not read, print, commit, or copy values from `.env.local` into task or session files.
