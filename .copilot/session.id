@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (SOS write path quality-gated)
+Updated: 2026-09-15 (SOS write path committed and pushed)
 Current phase: Phase 3 - Backend SOS API
-Status: Concrete SOS write path quality-gated; commit/push approval required
+Status: Concrete SOS write path committed and pushed; next task approval required
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -51,13 +51,15 @@ Completed this session:
 - Implemented Hono `POST /sos` with strict Zod validation, exact JWT protection, UUID sender validation, server-side Supabase REST persistence, and idempotency conflict recovery.
 - Connected the web SOS client and offline queue to `/sos`, preserving the idempotency key across retries.
 - SOS task tests, typecheck, lint, build, security, and performance gates pass.
+- User approved commit/push for the concrete SOS task.
+- Commit `4757e57d82a43d5b6cac1c98c26697d247b5bde3 feat(sos): persist authenticated events with idempotency` pushed successfully to `dev`.
 
 Blocker:
 - Live authenticated SOS persistence test remains pending; no permanent test credential was created.
 - FCM broadcast and concurrent resolution remain deferred.
 
 Next action when resuming:
-1. Obtain approval to commit/push the concrete SOS write path task.
+1. Obtain approval for the next task plan before changing code.
 2. Implement FCM broadcast through `waitUntil()`.
 3. Implement SOS resolve endpoint and concurrent resolution behavior.
 
