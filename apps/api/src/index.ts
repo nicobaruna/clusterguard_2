@@ -3,8 +3,9 @@ import { cors } from 'hono/cors';
 import { jwt } from 'hono/jwt';
 import { z } from 'zod';
 import { findByIdempotencyKey, insertSosEvent, type SupabaseBindings } from './supabase';
+import { broadcastSos } from './fcm';
 
-type Bindings = SupabaseBindings & { SUPABASE_JWT_SECRET: string; FRONTEND_URL?: string };
+type Bindings = SupabaseBindings & { SUPABASE_JWT_SECRET: string; FRONTEND_URL?: string; FCM_SERVER_KEY?: string };
 const app = new Hono<{ Bindings: Bindings }>();
 const sosBody = z.object({ category: z.enum(['MEDIS', 'BENCANA', 'KEAMANAN']) }).strict();
 const idempotencyKey = z.string().uuid();
@@ -27,6 +28,11 @@ app.post('/sos', async (c) => {
   try {
     const existing = await findByIdempotencyKey(c.env, key.data);
     const event = existing ?? await insertSosEvent(c.env, { senderId: user.sub, category: parsed.data.category, idempotencyKey: key.data });
+    if (!existing) {
+      c.executionCtx.waitUntil(
+        broadcastSos(c.env, event).catch((error) => console.error(error)),
+      );
+    }
     return c.json({ ok: true, event }, existing ? 200 : 201);
   } catch (error) {
     console.error(error);

@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: Concrete SOS write path implemented and quality-gated; commit/push approval required.
+Status: FCM broadcast implemented and quality-gated; commit/push approval required.
 
 ## Phase 0: Confirm decisions
 
@@ -82,6 +82,9 @@ Phase 2 validation completed for this task:
 - [x] Enforce UUID sender and idempotency-key validation.
 - [x] Recover concurrent idempotent insert conflicts.
 - [ ] Broadcast notifications asynchronously with `waitUntil()`.
+- [x] Broadcast FCM notifications asynchronously through `waitUntil()`.
+- [x] Filter notification targets to PIC users on duty with mobile device tokens.
+- [x] Isolate FCM failures from the persisted SOS response.
 - [ ] Implement authorized, idempotent `PATCH /sos/:id/resolve`.
 - [ ] Implement device-token registration/upsert.
 
@@ -91,6 +94,7 @@ Phase 3 validation completed for this task:
 - [x] Queue retries preserve the same idempotency key.
 - [x] Tests, typecheck, lint, build, security, and performance gates pass.
 - [ ] Live authenticated SOS persistence test.
+- [x] FCM tests cover token filtering, empty tokens, failure isolation, and idempotent no-rebroadcast behavior.
 
 ## Phase 4: Warga and Super Admin PWA
 
@@ -143,4 +147,4 @@ Phase 3 validation completed for this task:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync and concrete Hono SOS persistence are implemented and quality-gated. FCM broadcast and live authenticated SOS persistence remain future work. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync, Hono SOS persistence, and asynchronous FCM broadcast are implemented and quality-gated. Live authenticated SOS persistence remains future work. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.

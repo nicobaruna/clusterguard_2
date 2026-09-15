@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (SOS write path committed and pushed)
+Updated: 2026-09-15 (FCM broadcast quality-gated)
 Current phase: Phase 3 - Backend SOS API
-Status: Concrete SOS write path committed and pushed; next task approval required
+Status: FCM broadcast quality-gated; commit/push approval required
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -53,15 +53,18 @@ Completed this session:
 - SOS task tests, typecheck, lint, build, security, and performance gates pass.
 - User approved commit/push for the concrete SOS task.
 - Commit `4757e57d82a43d5b6cac1c98c26697d247b5bde3 feat(sos): persist authenticated events with idempotency` pushed successfully to `dev`.
+- Implemented server-side FCM token lookup filtered to PIC/on-duty/mobile devices and asynchronous multicast broadcast through `waitUntil()`.
+- FCM failures are caught and isolated from the successful persisted SOS response; idempotent retries do not rebroadcast.
+- FCM task quality gates pass: tests (30/30), typecheck, lint, build, security review, and performance review.
 
 Blocker:
 - Live authenticated SOS persistence test remains pending; no permanent test credential was created.
-- FCM broadcast and concurrent resolution remain deferred.
+- SOS resolve endpoint and concurrent resolution remain deferred.
 
 Next action when resuming:
-1. Obtain approval for the next task plan before changing code.
-2. Implement FCM broadcast through `waitUntil()`.
-3. Implement SOS resolve endpoint and concurrent resolution behavior.
+1. Obtain approval to commit/push the FCM broadcast task.
+2. Implement SOS resolve endpoint and concurrent resolution behavior.
+3. Add live authenticated SOS persistence verification.
 
 Security notes:
 - Do not read, print, commit, or copy values from `.env.local` into task or session files.
