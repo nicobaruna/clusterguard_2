@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { broadcastSos, getPicDeviceTokens } from './fcm';
 
 const bindings = { SUPABASE_URL: 'https://supabase.test', SUPABASE_SERVICE_ROLE_KEY: 'service-role-test', FCM_SERVER_KEY: 'fcm-test-key' };
-const event = { id: 'event-1', sender_id: '11111111-1111-4111-8111-111111111111', category: 'MEDIS' as const, status: 'PENDING' as const, client_idempotency_key: null, created_at: new Date().toISOString() };
+const event = { id: 'event-1', sender_id: '11111111-1111-4111-8111-111111111111', category: 'MEDIS' as const, status: 'PENDING' as const, resolved_by: null, resolved_at: null, client_idempotency_key: null, created_at: new Date().toISOString() };
 
 afterEach(() => vi.unstubAllGlobals());
 

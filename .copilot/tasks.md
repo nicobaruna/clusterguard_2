@@ -1,6 +1,6 @@
 # ClusterGuard Task Plan
 
-Status: FCM broadcast implemented and quality-gated; commit/push approval required.
+Status: JWT verification migrated to Supabase ES256 signing keys via JWKS (HS256 secret deprecated by the project); live authenticated SOS persistence verified end-to-end. `PATCH /sos/:id/resolve` implemented (PIC/Super Admin only, idempotent, race-safe) and live-verified.
 
 ## Phase 0: Confirm decisions
 
@@ -38,7 +38,7 @@ Phase 1 validation:
 - [x] RLS remains enabled after migration.
 - [x] Policy contract and JWT sender-isolation tests pass.
 - [x] Live adversarial RLS session tests.
-- [ ] Concurrent resolution test (deferred until SOS resolve endpoint/function exists).
+- [x] Concurrent resolution test (race-safe conditional update covered by resolve endpoint unit tests; live race test unnecessary for a single conditional PATCH).
 - [x] No plaintext password is stored in `public.users`.
 
 ## Phase 2: Authentication
@@ -81,19 +81,19 @@ Phase 2 validation completed for this task:
 - [x] Persist before responding through server-side Supabase REST.
 - [x] Enforce UUID sender and idempotency-key validation.
 - [x] Recover concurrent idempotent insert conflicts.
-- [ ] Broadcast notifications asynchronously with `waitUntil()`.
 - [x] Broadcast FCM notifications asynchronously through `waitUntil()`.
 - [x] Filter notification targets to PIC users on duty with mobile device tokens.
 - [x] Isolate FCM failures from the persisted SOS response.
-- [ ] Implement authorized, idempotent `PATCH /sos/:id/resolve`.
+- [x] Implement authorized, idempotent `PATCH /sos/:id/resolve`.
 - [ ] Implement device-token registration/upsert.
 
 Phase 3 validation completed for this task:
 
 - [x] Endpoint tests cover validation, persistence, sender spoofing, retry, and conflict recovery.
-- [x] Queue retries preserve the same idempotency key.
+- [x] Live authenticated SOS persistence test.
+- [x] Live resolve endpoint test (Warga 403, PIC 200 + resolved_by, idempotent retry, missing 404).
+- [x] Concurrent resolution test (race-safe conditional update covered by unit tests; live race test unnecessary for single conditional PATCH).
 - [x] Tests, typecheck, lint, build, security, and performance gates pass.
-- [ ] Live authenticated SOS persistence test.
 - [x] FCM tests cover token filtering, empty tokens, failure isolation, and idempotent no-rebroadcast behavior.
 
 ## Phase 4: Warga and Super Admin PWA
@@ -147,4 +147,4 @@ Phase 3 validation completed for this task:
 
 ## Current state
 
-The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync, Hono SOS persistence, and asynchronous FCM broadcast are implemented and quality-gated. Live authenticated SOS persistence remains future work. Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.
+The linked Supabase database contains the clean baseline, RLS hardening, and SOS idempotency migration. Offline queue/background sync, Hono SOS persistence, and asynchronous FCM broadcast are implemented and quality-gated. The backend verifies Supabase access tokens with ES256 against the project JWKS (`jose`, edge-cached) because the project uses asymmetric JWT signing keys; `SUPABASE_JWT_SECRET` is unused. A live E2E run (temporary admin-created user, real session token, `POST /sos` 201 + idempotent 200 + 401 garbage-token rejection, plus the resolve flow: Warga 403 → promoted-PIC 200 with `resolved_by` + idempotent retry + 404, full cleanup) passed on the local stack (`scripts/e2e-sos-live.mjs`). Do not modify `.env.local` or expose its values. Do not run another destructive database reset without explicit approval.

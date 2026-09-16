@@ -1,3 +1,5 @@
+import './styles.css';
+
 export const metadata = { title: 'ClusterGuard SOS' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

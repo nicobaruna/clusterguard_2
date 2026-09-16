@@ -1,8 +1,8 @@
 ClusterGuard resume checkpoint
 
-Updated: 2026-09-15 (FCM broadcast quality-gated)
+Updated: 2026-09-15 (FCM pushed; local services running)
 Current phase: Phase 3 - Backend SOS API
-Status: FCM broadcast quality-gated; commit/push approval required
+Status: FCM broadcast committed/pushed; local FE and BE running
 
 Completed this session:
 - Read all four project Markdown documents through a read-only scan.
@@ -56,6 +56,10 @@ Completed this session:
 - Implemented server-side FCM token lookup filtered to PIC/on-duty/mobile devices and asynchronous multicast broadcast through `waitUntil()`.
 - FCM failures are caught and isolated from the successful persisted SOS response; idempotent retries do not rebroadcast.
 - FCM task quality gates pass: tests (30/30), typecheck, lint, build, security review, and performance review.
+- Commit `0d5cb8e feat(notifications): broadcast SOS alerts asynchronously` pushed successfully to `dev`.
+- Local frontend running at `http://localhost:3000`.
+- Local backend running at `http://localhost:8787`; health route smoke test returned HTTP 200.
+- Backend protected routes require Worker bindings from `.dev.vars`; no secrets were written or exposed.
 
 Blocker:
 - Live authenticated SOS persistence test remains pending; no permanent test credential was created.
