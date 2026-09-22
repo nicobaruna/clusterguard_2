@@ -1,10 +1,86 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from './auth-store';
 import { createSyncManager } from './sync-manager';
 import { supabase } from '../lib/supabase';
-import { submitSos } from './sos-client';
+
+const CATEGORIES = [
+  { value: 'MEDIS', label: 'MEDIS', color: 'var(--critical)', icon: 'ambulance' },
+  { value: 'BENCANA', label: 'BENCANA', color: 'var(--warning)', icon: 'flame' },
+  { value: 'KEAMANAN', label: 'KEAMANAN', color: 'var(--security)', icon: 'shield' },
+] as const;
+
+function CategoryIcon({ name }: { name: string }) {
+  const common = {
+    width: '52',
+    height: '52',
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': 'true' as const,
+  };
+  if (name === 'ambulance') {
+    return (
+      <svg {...common}>
+        <rect x="3" y="6" width="13" height="11" rx="2" />
+        <path d="M16 9h3l2 2v4h-1" />
+        <circle cx="7.5" cy="17.5" r="1.5" />
+        <circle cx="15.5" cy="17.5" r="1.5" />
+        <path d="M9.5 6V4h3v2" />
+        <path d="M8 11h4M10 9v4" />
+      </svg>
+    );
+  }
+  if (name === 'flame') {
+    return (
+      <svg {...common}>
+        <path d="M12 3s5 4.5 5 10a5 5 0 0 1-10 0c0-2 1-3.6 2.2-4.8C10 10 12 12 12 12s2-2.5 1-6c-.4-1.4-1-2-1-3z" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  );
+}
+
+function Dashboard({ onSignOut }: { onSignOut: () => void }) {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+
+  return (
+    <main className="dashboard-shell">
+      <header className="dash-header">
+        <button className="ghost" type="button">Profil</button>
+        <button className="ghost" type="button" onClick={onSignOut}>Logout</button>
+      </header>
+      <section className="dash-hero">
+        <h1>Halo, {user?.fullName}{user?.houseNumber ? ` (${user.houseNumber})` : ''}</h1>
+        <p className="muted">Ada keadaan darurat?</p>
+      </section>
+      <section className="category-list" aria-label="Pilih kategori darurat">
+        {CATEGORIES.map((category) => (
+          <button
+            key={category.value}
+            className="category-card"
+            style={{ background: category.color }}
+            onClick={() => router.push(`/sos/confirm?category=${category.value}`)}
+          >
+            <span className="category-icon"><CategoryIcon name={category.icon} /></span>
+            <span className="category-label">{category.label}</span>
+          </button>
+        ))}
+      </section>
+    </main>
+  );
+}
 
 export default function HomePage() {
   const { user, initialize, signIn, signUp, signOut } = useAuthStore();
@@ -65,24 +141,7 @@ export default function HomePage() {
   };
 
   if (user) {
-    return (
-      <main className="auth-shell">
-        <section className="auth-card">
-          <p className="eyebrow">{user.role}</p>
-          <h1>Halo, {user.fullName}</h1>
-          <p>Akun Anda terhubung dengan autentikasi Supabase.</p>
-          <div className="tabs">
-            {(['MEDIS', 'BENCANA', 'KEAMANAN'] as const).map((category) => (
-              <button key={category} onClick={() => void submitSos(category, process.env.NEXT_PUBLIC_BACKEND_URL ?? '').then((result) => setMessage(
-                result === 'sent' ? 'SOS terkirim.' : result === 'queued' ? 'SOS disimpan dan menunggu sinkronisasi.' : result === 'unauthorized' ? 'Sesi berakhir. Silakan masuk kembali.' : 'SOS gagal dikirim.',
-              ))}>{category}</button>
-            ))}
-          </div>
-          {message && <p role="status" className="message">{message}</p>}
-          <button className="primary" onClick={() => void signOut()}>Keluar</button>
-        </section>
-      </main>
-    );
+    return <Dashboard onSignOut={() => void signOut()} />;
   }
 
   return (

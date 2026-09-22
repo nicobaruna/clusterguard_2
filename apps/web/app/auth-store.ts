@@ -5,7 +5,7 @@ import { persist } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 import { isEmailLoginAllowed, loginMismatchMessage, type UserRole } from './auth-policy';
 
-type SessionUser = { id: string; email: string; fullName: string; role: UserRole; phone?: string };
+type SessionUser = { id: string; email: string; fullName: string; role: UserRole; phone?: string; houseNumber?: string };
 
 type AuthState = {
   user: SessionUser | null;
@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthState>()(
         }
         const { data: profile, error } = await supabase
           .from('users')
-          .select('full_name, phone_number, role')
+          .select('full_name, phone_number, house_number, role')
           .eq('id', data.session.user.id)
           .single();
         if (error || !profile) {
@@ -46,6 +46,7 @@ export const useAuthStore = create<AuthState>()(
             fullName: profile.full_name,
             role: profile.role as UserRole,
             phone: profile.phone_number ?? undefined,
+            houseNumber: profile.house_number ?? undefined,
           },
         });
       },
@@ -59,7 +60,7 @@ export const useAuthStore = create<AuthState>()(
 
         const { data: profile, error: profileError } = await supabase
           .from('users')
-          .select('full_name, phone_number, role')
+          .select('full_name, phone_number, house_number, role')
           .eq('id', data.user.id)
           .single();
         if (profileError || !profile) {
@@ -80,6 +81,7 @@ export const useAuthStore = create<AuthState>()(
             fullName: profile.full_name,
             role,
             phone: profile.phone_number ?? undefined,
+            houseNumber: profile.house_number ?? undefined,
           },
         });
         return null;
